@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=42.0", "wheel"]
+build-backen = "setuptools.build_meta"
+
+[tools.pytest.ini_options]
+addopts = "--cov=job_notifications"
+testpaths = ["tests"]
+
+[tool.mypy]
+mypy_path = "src"
+check_untyped_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+show_error_codes = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true
