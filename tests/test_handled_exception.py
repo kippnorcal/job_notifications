@@ -1,5 +1,5 @@
 from job_notifications.notifications import Notifications
-from job_notifications.decorators import handled_exception, HandledException
+from job_notifications.utils.decorators import handled_exception, HandledException
 
 import pytest
 
