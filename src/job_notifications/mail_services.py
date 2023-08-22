@@ -33,6 +33,9 @@ class MailGunService(MailServiceBaseClass):
     def send_notification(self):
         pass
 
+    def email(self):
+        pass
+
 
 class SMTPService(MailServiceBaseClass):
 
@@ -41,3 +44,7 @@ class SMTPService(MailServiceBaseClass):
 
     def send_notification(self):
         pass
+
+    def email(self):
+        pass
+    
