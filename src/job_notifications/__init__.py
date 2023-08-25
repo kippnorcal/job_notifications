@@ -13,14 +13,15 @@ from job_notifications.utils.helpers import join_kwargs, join_args
 logger = logging.getLogger(__name__)
 
 
-def create_notifications(job_name: str, mail_service: str, *args, **kwargs):
+def create_notifications(job_name: str, mail_service: str, *args, **kwargs) -> Notifications:
+    """Entry point to package"""
     mail_service = create_mail_service(mail_service, args, kwargs)
     logs = kwargs.get('logs')
     return Notifications(job_name, mail_service, logs=logs)
 
 
 def handled_exception(exceptions: Union[Exception, tuple]):
-    """Handles any exception passed as an arg and logs it."""
+    """Decorator that handles any exception passed as an arg and logs it"""
     if not isinstance(exceptions, tuple):
         exceptions = (exceptions,)
 
@@ -38,7 +39,7 @@ def handled_exception(exceptions: Union[Exception, tuple]):
 
 
 def timer(func):
-    """Logs the runtime of the decorated function"""
+    """Decorator that logs the runtime of the decorated function"""
     @wraps(func)
     def wrapper_timer(*args, **kwargs):
         start_time = time.perf_counter()
@@ -51,7 +52,7 @@ def timer(func):
 
 
 def log_call(func):
-    """Logs the call args and return value of the decorated function"""
+    """Decorator that logs the call args and return value of the decorated function"""
     @wraps(func)
     def wrapper_exceptions(*args, **kwargs):
         value = func(*args, **kwargs)
