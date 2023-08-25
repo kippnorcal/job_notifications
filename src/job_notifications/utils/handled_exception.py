@@ -4,7 +4,7 @@ from functools import wraps
 from typing import Union
 from types import FunctionType
 
-from job_notifications.notifications import Notifications
+# from job_notifications.notifications import Notifications
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +21,7 @@ def handled_exception(exceptions: Union[Exception, tuple]):
             except exceptions as e:
                 handled_exception_obj = HandledException(func=func, exception=e, call_args=args, call_kwargs=kwargs)
                 logger.info(handled_exception_obj)
-                Notifications().add_to_exception_stack(handled_exception_obj)
+                # Notifications().add_to_exception_stack(handled_exception_obj)
         return wrapper_exceptions
     return decorator_exceptions
 
@@ -53,7 +53,10 @@ class HandledException:
         else:
             return "None"
 
-    def __str__(self):
+    def to_log(self):
         return f"{self.exception.__class__.__name__} raised on {self.func.__name__} in {self.func.__module__}" \
                f"\nArgs: {self._join_args()}" \
                f"\nKwargs: {self._join_kwargs()}"
+
+    def __str__(self):
+        return f"{self.exception.__class__.__name__} raised on {self.func.__name__} in {self.func.__module__}"

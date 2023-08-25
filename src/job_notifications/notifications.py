@@ -1,14 +1,32 @@
 import os
 from typing import Union, List
 
-from job_notifications.utils.decorators import HandledException
+from job_notifications.utils.handled_exception import HandledException
 from job_notifications.mail_services import MailServiceBaseClass
 
 
+class NotificationBase:
 
-class Notifications:
+    """
+    This base class exists as a helper to the @handled_exception decorator. The decorator
+    uses the add_to_exception_stack method to insert exceptions that it catches into the exception stack.
+    The other exception stack methods were included because it felt appropriate to group them together.
+    """
 
     _exception_stack: List[HandledException] = []
+
+    def add_to_exception_stack(self, e: HandledException) -> None:
+        self._exception_stack.append(e)
+
+    def exception_stack(self) -> list:
+        return self._exception_stack
+
+    @property
+    def exception_stack_empty(self):
+        return len(self._exception_stack) == 0
+
+
+class Notifications(NotificationBase):
 
     def __init__(self, job_name, mail_service: MailServiceBaseClass,
                  logs: Union[None, str, list] = None):
@@ -21,16 +39,6 @@ class Notifications:
             self._logs = [log]
         else:
             self._logs.append(log)
-
-    def add_to_exception_stack(self, e: HandledException) -> None:
-        self._exception_stack.append(e)
-
-    def exception_stack(self) -> list:
-        return self._exception_stack
-
-    @property
-    def exception_stack_empty(self):
-        return len(self._exception_stack) == 0
 
     def notify(self, error_message: Union[None, str] = None):
         """
@@ -85,4 +93,3 @@ class Notifications:
             for exception in self._exception_stack:
                 exceptions_log.write(exception.to_log())
         return log_file
-
