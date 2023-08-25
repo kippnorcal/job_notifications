@@ -1,6 +1,10 @@
 from abc import ABC
 from abc import abstractmethod
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 import os
+import smtplib
+import ssl
 from typing import Union, List
 
 import requests
@@ -91,19 +95,36 @@ class GmailSMTPService(MailServiceBaseClass):
         self.user = os.getenv("GMAIL_USER") or kwargs["GMAIL_USER"] or kwargs["user"]
         self.pwd = os.getenv("GMAIL_PASS") or kwargs["GMAIL_PASS"] or kwargs["user"]
 
-    def email(self):
-        with self.server as s:
-            s.login(self.user, self.password)
-            msg = self._message()
-            s.sendmail(self.user, self.to_address, msg)
+    def email(self,
+              to_address: str,
+              from_address: Union[None, str] = None,
+              subject: Union[None, str] = None,
+              body: Union[None, str] = None,
+              attachments: Union[None, str] = None) -> None:
 
-    def _attachment(self):
-        filename = "app.log"
-        if os.path.exists(filename):
-            with open(filename, "r") as attachment:
-                log = MIMEText(attachment.read())
-            log.add_header("Content-Disposition", f"attachment; filename= {filename}")
-            msg.attach(log)
+        context = ssl.create_default_context()
+        server = smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context)
+        with server as s:
+            email_contents = MIMEMultipart()
+            email_contents["Subject"] = subject
+            email_contents["From"] = self.user
+            email_contents["To"] = to_address
+            email_contents.attach(MIMEText(body, "plain"))
+            self._attachments(email_contents, attachments)
+            s.login(self.user, self.pwd)
+            s.sendmail(self.user, to_address, email_contents.as_string())
+
+    @staticmethod
+    def _attachments(message: MIMEMultipart, attachments: Union[str, list]) -> None:
+        """Attaches logs to email by converting log files to MIMEText object and attaching to MIMEMultipart object"""
+        attachments = [attachments] if isinstance(attachments, str) else attachments
+        for attachment in attachments:
+            if os.path.exists(attachment):
+                attachment_name = os.path.basename(attachment)
+                with open(attachment, "r") as file:
+                    log = MIMEText(file.read())
+                log.add_header("Content-Disposition", f"attachment; filename= {attachment_name}")
+                message.attach(log)
 
 
 def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
