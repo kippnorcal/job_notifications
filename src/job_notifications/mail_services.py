@@ -112,4 +112,3 @@ def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
         return service_obj(args, kwargs)
     except KeyError:
         raise Exception("Unable to find service")
-    
