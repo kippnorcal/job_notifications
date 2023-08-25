@@ -1,9 +1,9 @@
 from job_notifications.notifications import Notifications
-from job_notifications.utils.decorators import handled_exception, HandledException
+from job_notifications.utils.handled_exception import HandledException
+
+from job_notifications import handled_exception
 
 import pytest
-
-notifications = Notifications()
 
 
 @pytest.fixture
@@ -21,6 +21,7 @@ def function_for_testing():
 
 
 def test_exceptions_stack(function_for_testing):
+    notifications = Notifications('test')
     function_for_testing(2, 'blue', dog="Maisy")
     stack = notifications.exception_stack()
     print(stack[0])
