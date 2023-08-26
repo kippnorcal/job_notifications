@@ -18,7 +18,7 @@ class NotificationBase:
     def add_to_exception_stack(self, e: HandledException) -> None:
         self._exception_stack.append(e)
 
-    def exception_stack(self) -> list:
+    def exception_stack(self) -> List[HandledException]:
         return self._exception_stack
 
     @property
@@ -29,16 +29,13 @@ class NotificationBase:
 class Notifications(NotificationBase):
 
     def __init__(self, job_name, mail_service: MailServiceBaseClass,
-                 logs: Union[None, str, list] = None):
+                 logs: Union[None, List[str]] = None):
         self._job_name = job_name
         self._mail_service = mail_service
-        self._logs = list(logs) if isinstance(logs, str) else logs
+        self._logs = logs if logs is not None else []
 
     def add_log(self, log: str) -> None:
-        if self._logs is None:
-            self._logs = [log]
-        else:
-            self._logs.append(log)
+        self._logs.append(log)
 
     def notify(self, error_message: Union[None, str] = None):
         """
@@ -54,9 +51,9 @@ class Notifications(NotificationBase):
     def simple_email(self,
                      to_address: str,
                      from_address: str,
-                     subject: Union[None, str] = None,
-                     body: Union[None, str] = None,
-                     attachments: Union[None, str] = None) -> None:
+                     subject: str,
+                     body: str,
+                     attachments: Union[None, List[str]] = None) -> None:
         """
 
         :return:
@@ -84,7 +81,7 @@ class Notifications(NotificationBase):
             return f"{self._job_name} completed successfully."
 
     def _eval_notifications_exceptions_log(self) -> None:
-        if self._exception_stack:
+        if not self.exception_stack_empty:
             self._logs.append(self._create_notifications_exceptions_log())
 
     def _create_notifications_exceptions_log(self) -> str:

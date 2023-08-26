@@ -5,9 +5,9 @@ from email.mime.multipart import MIMEMultipart
 import os
 import smtplib
 import ssl
-from typing import Union, List
+from typing import Union, List, Tuple
 
-import requests
+import requests  # type: ignore
 
 SERVICE_LOOKUP = {
     "MAILGUN": 'MailGunService',
@@ -26,17 +26,17 @@ class MailServiceBaseClass(ABC):
         self.requests = requests
 
     def send_notification(self, message: str, subject: str,
-                          attachments: Union[None, list] = None, *args, **kwargs):
+                          attachments: Union[None, List[str]] = None, *args, **kwargs) -> None:
         """Send email success/error notifications using Mailgun API."""
-        self.email(self.to_address, self.from_address, subject, message, attachments=attachments)
+        self.email(self.to_address, self.from_address, subject, message, attachments=attachments)  # type: ignore
 
     @abstractmethod
     def email(self,
               to_address: str,
               from_address: str,
-              subject: Union[None, str] = None,
-              body: Union[None, str] = None,
-              attachments: Union[None, str] = None) -> None:
+              subject: str,
+              body: str,
+              attachments: Union[None, List[str]] = None) -> None:
         """
         Sends an adhoc email.
         """
@@ -56,12 +56,12 @@ class MailGunService(MailServiceBaseClass):
     def email(self,
               to_address: str,
               from_address: str,
-              subject: Union[None, str] = None,
-              body: Union[None, str] = None,
-              attachments: Union[None, str] = None) -> None:
+              subject: str,
+              body: str,
+              attachments: Union[None, List[str]] = None) -> None:
 
-        if attachments:
-            attachments = self._attachments(attachments)
+        if attachments is not None:
+            attachments = self._attachments(attachments)  # type: ignore
 
         self.requests.post(
             self.url,
@@ -76,8 +76,7 @@ class MailGunService(MailServiceBaseClass):
         )
 
     @staticmethod
-    def _attachments(attachments: Union[str, list]) -> List[tuple]:
-        attachments = [attachments] if isinstance(attachments, str) else attachments
+    def _attachments(attachments: List[str]) -> List[Tuple[str, Tuple[str, bytes]]]:
         attachment_container = []
         for attachment in attachments:
             if os.path.exists(attachment):
@@ -97,10 +96,10 @@ class GmailSMTPService(MailServiceBaseClass):
 
     def email(self,
               to_address: str,
-              from_address: Union[None, str] = None,
-              subject: Union[None, str] = None,
-              body: Union[None, str] = None,
-              attachments: Union[None, str] = None) -> None:
+              from_address: str,
+              subject: str,
+              body: str,
+              attachments: Union[None, List[str]] = None) -> None:
 
         context = ssl.create_default_context()
         server = smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context)
@@ -110,14 +109,14 @@ class GmailSMTPService(MailServiceBaseClass):
             email_contents["From"] = self.user
             email_contents["To"] = to_address
             email_contents.attach(MIMEText(body, "plain"))
-            self._attachments(email_contents, attachments)
+            if attachments is not None:
+                self._attachments(email_contents, attachments)
             s.login(self.user, self.pwd)
             s.sendmail(self.user, to_address, email_contents.as_string())
 
     @staticmethod
-    def _attachments(message: MIMEMultipart, attachments: Union[str, list]) -> None:
+    def _attachments(message: MIMEMultipart, attachments: List[str]) -> None:
         """Attaches logs to email by converting log files to MIMEText object and attaching to MIMEMultipart object"""
-        attachments = [attachments] if isinstance(attachments, str) else attachments
         for attachment in attachments:
             if os.path.exists(attachment):
                 attachment_name = os.path.basename(attachment)
@@ -130,6 +129,6 @@ class GmailSMTPService(MailServiceBaseClass):
 def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
     try:
         service_obj = SERVICE_LOOKUP[service.upper()]
-        return service_obj(args, kwargs)
+        return service_obj(args, kwargs)  # type: ignore
     except KeyError:
         raise Exception("Unable to find service")

@@ -1,6 +1,6 @@
 import os
 
-from job_notifications.mail_services import MailServiceBaseClass, MailGunService
+from job_notifications.mail_services import MailGunService
 
 from unittest.mock import patch, mock_open, Mock
 
@@ -8,7 +8,7 @@ import pytest
 
 
 def test_eval_status():
-    service = MailGunService(
+    return MailGunService(
         job_name='Test',
         to_address='test@test.com',
         from_address='testbot@testbot.com',
@@ -72,7 +72,7 @@ def test_mail_gun_attachments(x):
         url='http://none.org',
         key='8675309'
     )
-    test = service._attachments('app.log')
+    test = service._attachments(['app.log'])
     assert test == [('attachment', ('app.log', '1'))]
 
 

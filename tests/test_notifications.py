@@ -1,6 +1,4 @@
-import unittest
-from unittest.mock import Mock, mock_open, patch
-import os
+from unittest.mock import Mock
 
 from job_notifications.notifications import Notifications
 from job_notifications.mail_services import MailGunService
@@ -81,6 +79,7 @@ def test_body_generation_success_no_logs(notification_class):
 
 # subject generation
 
+
 def test_subject_failed(notification_class):
     notifications = notification_class
     error_message = "Whoops! There was an error!"
@@ -103,7 +102,8 @@ def test_subject_success(notification_class):
 
 
 def test_notify():
-    # Todo: Note that this is more of an integration test since it's involving data moving from the Notification object to the MaliGunService object
+    # Todo: Note that this is more of an integration test since it's
+    #  involving data moving from the Notification object to the MaliGunService object
     mail_service = MailGunService("to@test.com", 'from@test.com', key=None, url=None)
     mail_service.send_notification = Mock()
     notifications = Notifications("Test Job", mail_service)

@@ -1,7 +1,5 @@
 from dataclasses import dataclass, field
 import logging
-from functools import wraps
-from typing import Union
 from types import FunctionType
 
 from .helpers import join_args, join_kwargs
@@ -13,8 +11,8 @@ logger = logging.getLogger(__name__)
 class HandledException:
     func: FunctionType
     exception: Exception
-    call_args: field(default_factory=list)
-    call_kwargs: field(default_factory=dict)
+    call_args: field(default_factory=list)  # type: ignore
+    call_kwargs: field(default_factory=dict)  # type: ignore
 
     def _join_kwargs(self):
         if self.call_kwargs:
