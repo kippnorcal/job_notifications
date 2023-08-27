@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=42.0", "wheel"]
-build-backen = "setuptools.build_meta"
+build-backend = "setuptools.build_meta"
 
 [tools.pytest.ini_options]
 addopts = "--cov=job_notifications"
