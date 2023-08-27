@@ -9,11 +9,6 @@ from typing import Union, List, Tuple
 
 import requests  # type: ignore
 
-SERVICE_LOOKUP = {
-    "MAILGUN": 'MailGunService',
-    "GMAIL": 'GmailSMTPService'
-}
-
 
 class MailServiceBaseClass(ABC):
     """
@@ -132,3 +127,9 @@ def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
         return service_obj(args, kwargs)  # type: ignore
     except KeyError:
         raise Exception("Unable to find service")
+
+
+SERVICE_LOOKUP = {
+    "MAILGUN": MailGunService,
+    "GMAIL": GmailSMTPService
+}
