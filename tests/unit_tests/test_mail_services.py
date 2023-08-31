@@ -1,6 +1,7 @@
 import os
 
-from job_notifications.mail_services import MailGunService
+from job_notifications.mail_services import GmailSMTPService, MailGunService, create_mail_service
+from job_notifications.utils.exceptions import MailServiceNotFound
 
 from unittest.mock import patch, mock_open, Mock
 
@@ -93,3 +94,102 @@ def test_mail_gun_attachments_multiple(x):
         ('attachment', ('some.log', '1')),
         ('attachment', ('test.log', '1'))
     ]
+
+
+def test_mail_service_creation_with_args_mailgun():
+    creation_args = {
+        "from_address": "test@from.address",
+        "to_address": "test@to.address",
+        "MG_URL": "http://some.url",
+        "MG_DOMAIN": "foo.bar/v1",
+        "MG_KEY": '123key'
+    }
+    result = create_mail_service('MailGun', **creation_args)
+    assert isinstance(result, MailGunService)
+    assert result.to_address == "test@to.address"
+    assert result.from_address == "test@from.address"
+    assert result.url == 'http://some.url'
+    assert result.key == "123key"
+    assert result.domain == "foo.bar/v1"
+
+
+def test_mail_service_creation_with_env_vars_mailgun(monkeypatch):
+    monkeypatch.setenv("TO_ADDRESS", "test@to.address")
+    monkeypatch.setenv("FROM_ADDRESS", "test@from.address")
+    monkeypatch.setenv("MG_URL", "http://some.url")
+    monkeypatch.setenv("MG_DOMAIN", "foo.bar/v1")
+    monkeypatch.setenv("MG_KEY", "123key")
+
+    result = create_mail_service('MailGun')
+    assert isinstance(result, MailGunService)
+    assert result.to_address == "test@to.address"
+    assert result.from_address == "test@from.address"
+    assert result.url == 'http://some.url'
+    assert result.key == "123key"
+    assert result.domain == "foo.bar/v1"
+
+
+def test_mail_service_creation_with_general_args_mailgun():
+    creation_args = {
+        "from_address": "test@from.address",
+        "to_address": "test@to.address",
+        "url": "http://some.url",
+        "domain": "foo.bar/v1",
+        "key": '123key'
+    }
+    result = create_mail_service('MailGun', **creation_args)
+    assert isinstance(result, MailGunService)
+    assert result.to_address == "test@to.address"
+    assert result.from_address == "test@from.address"
+    assert result.url == 'http://some.url'
+    assert result.key == "123key"
+    assert result.domain == "foo.bar/v1"
+
+
+def test_mail_service_creation_with_args_gmail():
+    creation_args = {
+        "from_address": "test@from.address",
+        "to_address": "test@to.address",
+        "GMAIL_USER": "test@from.address",
+        "GMAIL_PASS": '123key'
+    }
+    result = create_mail_service('gmail', **creation_args)
+    assert isinstance(result, GmailSMTPService)
+    assert result.to_address == "test@to.address"
+    assert result.from_address == "test@from.address"
+    assert result.user == "test@from.address"
+    assert result.pwd == "123key"
+
+
+def test_mail_service_creation_with_env_vars_gmail(monkeypatch):
+    monkeypatch.setenv("TO_ADDRESS", "test@to.address")
+    monkeypatch.setenv("FROM_ADDRESS", "test@from.address")
+    monkeypatch.setenv("GMAIL_USER", "test@from.address")
+    monkeypatch.setenv("GMAIL_PASS", "123key")
+
+    result = create_mail_service('gmail')
+    assert isinstance(result, GmailSMTPService)
+    assert result.to_address == "test@to.address"
+    assert result.from_address == "test@from.address"
+    assert result.user == "test@from.address"
+    assert result.pwd == "123key"
+
+
+def test_mail_service_creation_with_general_args_gmail():
+    creation_args = {
+        "from_address": "test@from.address",
+        "to_address": "test@to.address",
+        "user": "test@from.address",
+        "pass": '123key'
+    }
+    result = create_mail_service('gmail', **creation_args)
+    assert isinstance(result, GmailSMTPService)
+    assert result.to_address == "test@to.address"
+    assert result.from_address == "test@from.address"
+    assert result.user == "test@from.address"
+    assert result.pwd == "123key"
+
+
+def test_mail_service_creation_raise_exception():
+    with pytest.raises(MailServiceNotFound):
+        create_mail_service("FooBar")
