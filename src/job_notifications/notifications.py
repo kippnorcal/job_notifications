@@ -44,7 +44,7 @@ class Notifications(NotificationBase):
 
         subject = self._generate_notification_subject(error_message)
         message = self._generate_notification_body(error_message)
-        self._create_notifications_exceptions_log()
+        self._eval_notifications_exceptions_log()
         self._mail_service.send_notification(message, subject, attachments=self._logs)
 
     def simple_email(self,
@@ -85,7 +85,7 @@ class Notifications(NotificationBase):
 
     def _create_notifications_exceptions_log(self) -> str:
         log_file = os.getenv("EXCEPTIONS_LOG_FILE") or '/exceptions.log'
-        with open(log_file, 'w') as exceptions_log:
+        with open(log_file, 'a') as exceptions_log:
             for exception in self._exception_stack:
-                exceptions_log.write(exception.to_log())
+                exceptions_log.write(f'{exception.to_log()}\n')
         return log_file
