@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tools.pytest.ini_options]
 addopts = "--cov=job_notifications"
-testpaths = ["tests"]
+testpaths = ["tests", "unit_tests"]
 
 [tool.mypy]
 mypy_path = "src"
