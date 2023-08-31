@@ -61,8 +61,8 @@ class MailGunService(MailServiceBaseClass):
         if attachments is not None:
             attachments = self._attachments(attachments)  # type: ignore
 
-        self.requests.post(
-            self.url,
+        requests.post(
+            f"{self.url}{self.domain}/messages",
             auth=("api", self.key),
             files=attachments,
             data={
