@@ -27,9 +27,11 @@ class HandledException:
             return "None"
 
     def to_log(self):
-        return f"{self.exception.__class__.__name__} raised on {self.func.__name__} in {self.func.__module__}" \
+        return f"{self.exception.__class__.__name__} raised on {self.func.__name__} " \
+               f"function in {self.func.__module__} module" \
                f"\nArgs: {join_args(self.call_args)}" \
                f"\nKwargs: {join_kwargs(self.call_kwargs)}"
 
     def __str__(self):
-        return f"{self.exception.__class__.__name__} raised on {self.func.__name__} in {self.func.__module__}"
+        return f"{self.exception.__class__.__name__} raised on {self.func.__name__} " \
+               f"function in {self.func.__module__} module"
