@@ -9,6 +9,8 @@ from typing import Union, List, Tuple
 
 import requests
 
+from job_notifications.utils.exceptions import MailServiceNotFound
+
 
 class MailServiceBaseClass(ABC):
     """
@@ -126,13 +128,13 @@ class GmailSMTPService(MailServiceBaseClass):
 
 def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
     try:
-        service_obj = SERVICE_LOOKUP[service.upper()]
+        service_obj = SERVICE_REGISTRY[service.upper()]
         return service_obj(*args, **kwargs)
     except KeyError:
-        raise Exception("Unable to find service")
+        raise MailServiceNotFound(f"Unable to fetch mail service. {service} is an unknown service")
 
 
-SERVICE_LOOKUP = {
+SERVICE_REGISTRY = {
     "MAILGUN": MailGunService,
     "GMAIL": GmailSMTPService
 }
