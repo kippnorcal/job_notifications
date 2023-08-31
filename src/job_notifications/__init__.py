@@ -2,7 +2,7 @@ from datetime import timedelta
 import logging
 from functools import wraps
 import time
-from typing import Union, Tuple
+from typing import Union, Tuple, List
 
 from job_notifications.notifications import NotificationBase, Notifications
 from job_notifications.utils.handled_exception import HandledException
@@ -13,14 +13,21 @@ from job_notifications.utils.helpers import join_kwargs, join_args
 logger = logging.getLogger(__name__)
 
 
-def create_notifications(job_name: str, mail_service: str, *args, **kwargs) -> Notifications:
+def create_notifications(job_name: str,
+                         mail_service: str,
+                         logs: Union[None, str, List[str]] = None, *args, **kwargs) -> Notifications:
     """Entry point to package"""
     mail_service_obj = create_mail_service(mail_service, args, kwargs)
-    logs = kwargs.get('logs')
-    return Notifications(job_name, mail_service_obj, logs=logs)
+    notifications_obj = Notifications(job_name, mail_service_obj)
+    if isinstance(logs, str):
+        notifications_obj.add_log(logs)
+    elif isinstance(logs, list):
+        for log in logs:
+            notifications_obj.add_log(log)
+    return notifications_obj
 
 
-def handled_exception(exceptions: Union[Exception, Tuple[Exception]]):
+def handled_exception(exceptions: Union[BaseException, Tuple[BaseException]]):
     """Decorator that handles any exception passed as an arg and logs it"""
     if not isinstance(exceptions, tuple):
         exceptions = (exceptions,)

@@ -28,11 +28,10 @@ class NotificationBase:
 
 class Notifications(NotificationBase):
 
-    def __init__(self, job_name, mail_service: MailServiceBaseClass,
-                 logs: Union[None, List[str]] = None):
+    def __init__(self, job_name, mail_service: MailServiceBaseClass):
         self._job_name = job_name
         self._mail_service = mail_service
-        self._logs = logs if logs is not None else []
+        self._logs = []
 
     def add_log(self, log: str) -> None:
         self._logs.append(log)
