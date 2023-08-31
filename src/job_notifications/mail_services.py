@@ -7,7 +7,7 @@ import smtplib
 import ssl
 from typing import Union, List, Tuple
 
-import requests  # type: ignore
+import requests
 
 
 class MailServiceBaseClass(ABC):
@@ -16,14 +16,16 @@ class MailServiceBaseClass(ABC):
     """
 
     def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
-        self.to_address = to_address or os.getenv("TO_ADDRESS")
-        self.from_address = from_address or os.getenv("FROM_ADDRESS")
-        self.requests = requests
+        self.to_address = os.getenv("TO_ADDRESS") or to_address
+        self.from_address = os.getenv("FROM_ADDRESS") or from_address
 
     def send_notification(self, message: str, subject: str,
                           attachments: Union[None, List[str]] = None, *args, **kwargs) -> None:
         """Send email success/error notifications using Mailgun API."""
-        self.email(self.to_address, self.from_address, subject, message, attachments=attachments)  # type: ignore
+        if self.to_address or self.from_address or subject or message is not None:
+            self.email(self.to_address, self.from_address, subject, message, attachments=attachments)
+        else:
+            raise Exception("Unable to send notification. To Address, From Address, Subject, or Message is None")
 
     @abstractmethod
     def email(self,
@@ -43,9 +45,10 @@ class MailGunService(MailServiceBaseClass):
 
     """
 
-    def __init__(self, to_address, from_address, *args, **kwargs):
+    def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
         super().__init__(to_address, from_address)
         self.url = os.getenv("MG_URL") or kwargs.get("MG_URL") or kwargs.get("url")
+        self.domain = os.getenv("MG_DOMAIN") or kwargs.get("MG_DOMAIN") or kwargs.get("MG_DOMAIN")
         self.key = os.getenv("MG_KEY") or kwargs.get("MG_KEY") or kwargs.get("key")
 
     def email(self,
@@ -84,8 +87,8 @@ class MailGunService(MailServiceBaseClass):
 
 class GmailSMTPService(MailServiceBaseClass):
 
-    def __init__(self, job_name, to_address, from_address, *args, **kwargs):
-        super().__init__(job_name, to_address, from_address)
+    def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
+        super().__init__(to_address, from_address)
         self.user = os.getenv("GMAIL_USER") or kwargs["GMAIL_USER"] or kwargs["user"]
         self.pwd = os.getenv("GMAIL_PASS") or kwargs["GMAIL_PASS"] or kwargs["user"]
 
@@ -124,7 +127,7 @@ class GmailSMTPService(MailServiceBaseClass):
 def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
     try:
         service_obj = SERVICE_LOOKUP[service.upper()]
-        return service_obj(args, kwargs)  # type: ignore
+        return service_obj(*args, **kwargs)
     except KeyError:
         raise Exception("Unable to find service")
 
