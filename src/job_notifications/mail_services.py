@@ -48,7 +48,7 @@ class MailGunService(MailServiceBaseClass):
     def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
         super().__init__(to_address, from_address)
         self.url = os.getenv("MG_URL") or kwargs.get("MG_URL") or kwargs.get("url")
-        self.domain = os.getenv("MG_DOMAIN") or kwargs.get("MG_DOMAIN") or kwargs.get("MG_DOMAIN")
+        self.domain = os.getenv("MG_DOMAIN") or kwargs.get("MG_DOMAIN") or kwargs.get("domain")
         self.key = os.getenv("MG_KEY") or kwargs.get("MG_KEY") or kwargs.get("key")
 
     def email(self,
@@ -89,8 +89,8 @@ class GmailSMTPService(MailServiceBaseClass):
 
     def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
         super().__init__(to_address, from_address)
-        self.user = os.getenv("GMAIL_USER") or kwargs["GMAIL_USER"] or kwargs["user"]
-        self.pwd = os.getenv("GMAIL_PASS") or kwargs["GMAIL_PASS"] or kwargs["user"]
+        self.user = os.getenv("GMAIL_USER") or kwargs.get("GMAIL_USER") or kwargs.get("user")
+        self.pwd = os.getenv("GMAIL_PASS") or kwargs.get("GMAIL_PASS") or kwargs.get("pass")
 
     def email(self,
               to_address: str,
