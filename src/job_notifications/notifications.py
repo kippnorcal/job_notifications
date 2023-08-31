@@ -74,9 +74,9 @@ class Notifications(NotificationBase):
             return f"{self._job_name} encountered an error: \n {error_message}"
         elif not self.exception_stack_empty:
             return f"{self._job_name} completed with {len(self._exception_stack)} " \
-                   f"exceptions handled - see logs for details."
+                   f"exception(s) handled - see log(s) for details."
         elif self._logs:
-            return f"{self._job_name} completed successfully. See attached logs for details."
+            return f"{self._job_name} completed successfully. See attached log(s) for details."
         else:
             return f"{self._job_name} completed successfully."
 

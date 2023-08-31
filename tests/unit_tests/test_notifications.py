@@ -61,7 +61,7 @@ def test_body_generation_warnings(notification_class):
     handled_exception = Mock()
     notifications.add_to_exception_stack(handled_exception)
     result = notifications._generate_notification_body(None)
-    assert result == 'Test Job completed with 1 exceptions handled - see logs for details.'
+    assert result == 'Test Job completed with 1 exception(s) handled - see log(s) for details.'
 
 
 def test_body_generation_success_with_logs(notification_class):
@@ -69,7 +69,7 @@ def test_body_generation_success_with_logs(notification_class):
     notifications = notification_class
     notifications.add_log(mock_logs)
     result = notifications._generate_notification_body(None)
-    assert result == 'Test Job completed successfully. See attached logs for details.'
+    assert result == 'Test Job completed successfully. See attached log(s) for details.'
 
 
 def test_body_generation_success_no_logs(notification_class):
