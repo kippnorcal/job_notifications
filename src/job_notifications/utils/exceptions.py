@@ -1,0 +1,3 @@
+
+class MailServiceNotFound(Exception):
+    pass

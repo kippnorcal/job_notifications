@@ -28,11 +28,10 @@ class NotificationBase:
 
 class Notifications(NotificationBase):
 
-    def __init__(self, job_name, mail_service: MailServiceBaseClass,
-                 logs: Union[None, List[str]] = None):
+    def __init__(self, job_name, mail_service: MailServiceBaseClass):
         self._job_name = job_name
         self._mail_service = mail_service
-        self._logs = logs if logs is not None else []
+        self._logs = []
 
     def add_log(self, log: str) -> None:
         self._logs.append(log)
@@ -45,7 +44,7 @@ class Notifications(NotificationBase):
 
         subject = self._generate_notification_subject(error_message)
         message = self._generate_notification_body(error_message)
-        self._create_notifications_exceptions_log()
+        self._eval_notifications_exceptions_log()
         self._mail_service.send_notification(message, subject, attachments=self._logs)
 
     def simple_email(self,
@@ -74,9 +73,9 @@ class Notifications(NotificationBase):
             return f"{self._job_name} encountered an error: \n {error_message}"
         elif not self.exception_stack_empty:
             return f"{self._job_name} completed with {len(self._exception_stack)} " \
-                   f"exceptions handled - see logs for details."
+                   f"exception(s) handled - see log(s) for details."
         elif self._logs:
-            return f"{self._job_name} completed successfully. See attached logs for details."
+            return f"{self._job_name} completed successfully. See attached log(s) for details."
         else:
             return f"{self._job_name} completed successfully."
 
@@ -86,7 +85,7 @@ class Notifications(NotificationBase):
 
     def _create_notifications_exceptions_log(self) -> str:
         log_file = os.getenv("EXCEPTIONS_LOG_FILE") or '/exceptions.log'
-        with open(log_file, 'w') as exceptions_log:
+        with open(log_file, 'a') as exceptions_log:
             for exception in self._exception_stack:
-                exceptions_log.write(exception.to_log())
+                exceptions_log.write(f'{exception.to_log()}\n')
         return log_file
