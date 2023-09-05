@@ -9,9 +9,9 @@ tox = "*"
 pytest = "*"
 pytest-cov = "*"
 mypy = "*"
+requests = "*"
 
 [packages]
-requests = "*"
 job-notifications = {editable = true, path = "."}
 
 [requires]
