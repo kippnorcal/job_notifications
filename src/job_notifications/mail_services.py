@@ -9,7 +9,7 @@ from typing import Union, List, Tuple
 
 import requests
 
-from job_notifications.utils.exceptions import MailServiceNotFound
+from job_notifications.utils.exceptions import MailServiceNotFound, MissingRequests
 
 
 class MailServiceBaseClass(ABC):
@@ -59,6 +59,11 @@ class MailGunService(MailServiceBaseClass):
               subject: str,
               body: str,
               attachments: Union[None, List[str]] = None) -> None:
+
+        try:
+            import requests
+        except ImportError:
+            raise MissingRequests("Check that the requests package is installed; Needed for using Mail Gun")
 
         if attachments is not None:
             attachments = self._attachments(attachments)  # type: ignore
