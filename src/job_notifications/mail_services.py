@@ -7,14 +7,12 @@ import smtplib
 import ssl
 from typing import Union, List, Tuple
 
-import requests
-
 from job_notifications.utils.exceptions import MailServiceNotFound, MissingRequests
 
 
 class MailServiceBaseClass(ABC):
     """
-    Interface for different mail services to implement.
+    Base class that provides an interface for mail services to implement.
     """
 
     def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
@@ -44,7 +42,7 @@ class MailServiceBaseClass(ABC):
 
 class MailGunService(MailServiceBaseClass):
     """
-
+    Class for sending emails through the MailGun API
     """
 
     def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
@@ -62,8 +60,8 @@ class MailGunService(MailServiceBaseClass):
 
         try:
             import requests
-        except ImportError:
-            raise MissingRequests("Check that the requests package is installed; Needed for using Mail Gun")
+        except ModuleNotFoundError:
+            raise MissingRequests("Check that the requests package is installed; Needed for using MailGun")
 
         if attachments is not None:
             attachments = self._attachments(attachments)  # type: ignore
@@ -93,6 +91,9 @@ class MailGunService(MailServiceBaseClass):
 
 
 class GmailSMTPService(MailServiceBaseClass):
+    """
+    Class for sending emails through Google's SMTP server
+    """
 
     def __init__(self, to_address: Union[None, str] = None, from_address: Union[None, str] = None, *args, **kwargs):
         super().__init__(to_address, from_address)
@@ -132,6 +133,9 @@ class GmailSMTPService(MailServiceBaseClass):
 
 
 def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
+    """
+    Finds service in SERVICE_REGISTRY and returns a subclass instance of MailServiceBaseClass
+    """
     try:
         service_obj = SERVICE_REGISTRY[service.upper()]
         return service_obj(*args, **kwargs)
@@ -139,6 +143,7 @@ def create_mail_service(service: str,  *args, **kwargs) -> MailServiceBaseClass:
         raise MailServiceNotFound(f"Unable to fetch mail service. {service} is an unknown service")
 
 
+"""The below registry is used to lookup the mail service that is called through the create_notifications entrypoint"""
 SERVICE_REGISTRY = {
     "MAILGUN": MailGunService,
     "GMAIL": GmailSMTPService
