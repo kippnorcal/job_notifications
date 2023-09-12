@@ -45,17 +45,22 @@ def handled_exception(exceptions: Union[BaseException, Tuple[BaseException]]):
     return decorator_exceptions
 
 
-def timer(func):
+def timer(name: Union[None, str] = None):
     """Decorator that logs the runtime of the decorated function"""
-    @wraps(func)
-    def wrapper_timer(*args, **kwargs):
-        start_time = time.perf_counter()
-        value = func(*args, **kwargs)
-        end_time = time.perf_counter()
-        run_time = end_time - start_time
-        logger.info(f"{func.__module__}.{func.__name__} finished in {timedelta(seconds=run_time)}")
-        return value
-    return wrapper_timer
+    def decorator_timer(func):
+        @wraps(func)
+        def wrapper_timer(*args, **kwargs):
+            start_time = time.perf_counter()
+            value = func(*args, **kwargs)
+            end_time = time.perf_counter()
+            run_time = end_time - start_time
+            if name is not None:
+                logger.info(f"{name} finished in {timedelta(seconds=run_time)}")
+            else:
+                logger.info(f"{func.__module__}.{func.__name__} finished in {timedelta(seconds=run_time)}")
+            return value
+        return wrapper_timer
+    return decorator_timer
 
 
 def log_call(func):
