@@ -3,6 +3,8 @@ requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tools.pytest.ini_options]
+log_cli = true
+log_cli_level = "INFO"
 addopts = "--cov=job_notifications"
 testpaths = ["tests", "unit_tests"]
 

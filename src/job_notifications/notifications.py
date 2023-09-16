@@ -10,7 +10,7 @@ class NotificationBase:
     """
     This base class exists as a helper to the @handled_exception decorator. The decorator
     uses the add_to_exception_stack method to insert exceptions that it catches into the exception stack.
-    The other exception stack methods were included because it felt appropriate to group them together.
+    The other methods related to the exception stack were included to group them together in one place.
     """
 
     _exception_stack: List[HandledException] = []
