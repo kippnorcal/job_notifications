@@ -10,6 +10,7 @@ pytest = "*"
 pytest-cov = "*"
 mypy = "*"
 requests = "*"
+build = "*"
 
 [packages]
 job-notifications = {editable = true, path = "."}

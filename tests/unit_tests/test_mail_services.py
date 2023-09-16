@@ -18,14 +18,6 @@ def test_eval_status():
     )
 
 
-def test_notification_subject():
-    pass
-
-
-def test_body():
-    pass
-
-
 @pytest.fixture
 def mail_gun_setup_init_kwargs():
     service = MailGunService(
@@ -46,8 +38,8 @@ def test_mail_gun_init_kwargs(mail_gun_setup_init_kwargs):
 
 @pytest.fixture
 def mail_gun_setup_init_env(monkeypatch):
-    monkeypatch.setenv("MG_URL", 'http://none.org')
-    monkeypatch.setenv("MG_KEY", '8675309')
+    monkeypatch.setenv("MG_API_URL", 'http://none.org')
+    monkeypatch.setenv("MG_API_KEY", '8675309')
     service = MailGunService(
         job_name='Test',
         to_address='test@test.com',
@@ -100,9 +92,9 @@ def test_mail_service_creation_with_args_mailgun():
     creation_args = {
         "from_address": "test@from.address",
         "to_address": "test@to.address",
-        "MG_URL": "http://some.url",
+        "MG_API_URL": "http://some.url",
         "MG_DOMAIN": "foo.bar/v1",
-        "MG_KEY": '123key'
+        "MG_API_KEY": '123key'
     }
     result = create_mail_service('MailGun', **creation_args)
     assert isinstance(result, MailGunService)
@@ -116,9 +108,9 @@ def test_mail_service_creation_with_args_mailgun():
 def test_mail_service_creation_with_env_vars_mailgun(monkeypatch):
     monkeypatch.setenv("TO_ADDRESS", "test@to.address")
     monkeypatch.setenv("FROM_ADDRESS", "test@from.address")
-    monkeypatch.setenv("MG_URL", "http://some.url")
+    monkeypatch.setenv("MG_API_URL", "http://some.url")
     monkeypatch.setenv("MG_DOMAIN", "foo.bar/v1")
-    monkeypatch.setenv("MG_KEY", "123key")
+    monkeypatch.setenv("MG_API_KEY", "123key")
 
     result = create_mail_service('MailGun')
     assert isinstance(result, MailGunService)
