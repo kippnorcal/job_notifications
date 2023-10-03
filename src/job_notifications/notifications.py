@@ -52,12 +52,14 @@ class Notifications(NotificationBase):
                      from_address: str,
                      subject: str,
                      body: str,
+                     cc: Union[None, str] = None,
+                     bcc: Union[None, str] = None,
                      attachments: Union[None, List[str]] = None) -> None:
         """
 
         :return:
         """
-        self._mail_service.email(to_address, from_address, subject, body, attachments)
+        self._mail_service.email(to_address, from_address, subject, body, cc, bcc, attachments)
 
     def _generate_notification_subject(self, error_message):
         if error_message:
