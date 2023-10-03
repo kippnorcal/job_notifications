@@ -33,6 +33,8 @@ class MailServiceBaseClass(ABC):
               from_address: str,
               subject: str,
               body: str,
+              cc: Union[None, str] = None,
+              bcc: Union[None, str] = None,
               attachments: Union[None, List[str]] = None) -> None:
         """
         Sends an adhoc email.
@@ -56,6 +58,8 @@ class MailGunService(MailServiceBaseClass):
               from_address: str,
               subject: str,
               body: str,
+              cc: Union[None, str] = None,
+              bcc: Union[None, str] = None,
               attachments: Union[None, List[str]] = None) -> None:
 
         try:
@@ -75,6 +79,8 @@ class MailGunService(MailServiceBaseClass):
                 "to": to_address,
                 "subject": subject,
                 "text": body,
+                "cc": cc,
+                "bcc": bcc,
             },
         )
 
@@ -105,6 +111,8 @@ class GmailSMTPService(MailServiceBaseClass):
               from_address: str,
               subject: str,
               body: str,
+              cc: Union[None, str] = None,
+              bcc: Union[None, str] = None,
               attachments: Union[None, List[str]] = None) -> None:
 
         context = ssl.create_default_context()
@@ -114,6 +122,8 @@ class GmailSMTPService(MailServiceBaseClass):
             email_contents["Subject"] = subject
             email_contents["From"] = self.user
             email_contents["To"] = to_address
+            email_contents["CC"] = cc
+            email_contents["BCC"] = bcc
             email_contents.attach(MIMEText(body, "plain"))
             if attachments is not None:
                 self._attachments(email_contents, attachments)
