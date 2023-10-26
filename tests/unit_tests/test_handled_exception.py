@@ -1,6 +1,7 @@
+from contextlib import contextmanager
+
 from job_notifications.notifications import NotificationBase
 from job_notifications.utils.handled_exception import HandledException
-
 from job_notifications import handled_exception
 
 import pytest
@@ -40,3 +41,56 @@ def test_exceptions_stack_two(function_for_testing_exception_not_explicitly_rais
     print(stack[1])
     # assert len(stack) == 1
     assert isinstance(stack[0], HandledException)
+
+
+def test_handled_exception_catch_error():
+    @handled_exception(KeyError)
+    def to_be_decorated(num):
+        if num == 1:
+            raise KeyError
+        else:
+            return True
+    result = to_be_decorated(1)
+    assert result is not True
+
+
+def test_handled_exception_re_raises_error():
+    @handled_exception(KeyError, re_raise=True)
+    def to_be_decorated():
+        raise KeyError
+    with pytest.raises(KeyError):
+        to_be_decorated()
+
+
+def test_handled_exception_re_raises_multiple_error_value_error():
+    @handled_exception((KeyError, ValueError), re_raise=True)
+    def to_be_decorated():
+        raise ValueError
+    with pytest.raises(ValueError):
+        to_be_decorated()
+
+
+def test_handled_exception_re_raises_multiple_error_key_error():
+    @handled_exception((KeyError, ValueError), re_raise=True)
+    def to_be_decorated():
+        raise KeyError
+    with pytest.raises(KeyError):
+        to_be_decorated()
+
+
+@pytest.mark.xfail(reason="Expecting that KeyError will not be raised")
+def test_handled_exception_does_not_re_raises_error():
+    @handled_exception((KeyError, ValueError), re_raise=[ValueError])
+    def to_be_decorated():
+        raise KeyError
+    with pytest.raises(KeyError):
+        to_be_decorated()
+
+
+def test_handled_exception_re_raises_correct_error():
+    @handled_exception((KeyError, ValueError), re_raise=[ValueError])
+    def to_be_decorated():
+        raise ValueError
+    with pytest.raises(ValueError):
+        to_be_decorated()
+
