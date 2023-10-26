@@ -112,3 +112,19 @@ def test_notify():
     notifications._create_notifications_exceptions_log = Mock().return_value('Cat')
     notifications.notify()
     print(mail_service.send_notification.call_count)
+
+
+def test_extend_job_name():
+    mail_service = MailGunService("to@test.com", 'from@test.com', key=None, url=None)
+    notifications = Notifications("Test Job", mail_service)
+    notifications.extend_job_name("extend once")
+    assert notifications._job_name == "Test Job extend once"
+
+
+def test_extend_job_name_twice():
+
+    mail_service = MailGunService("to@test.com", 'from@test.com', key=None, url=None)
+    notifications = Notifications("Test Job", mail_service)
+    notifications.extend_job_name("extend once")
+    notifications.extend_job_name("extend again")
+    assert notifications._job_name == "Test Job extend once extend again"
