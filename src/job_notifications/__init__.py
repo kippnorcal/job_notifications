@@ -24,8 +24,12 @@ def create_notifications(job_name: str,
     return notifications_obj
 
 
-def handled_exception(exceptions: Union[BaseException, Tuple[BaseException]]):
-    """Decorator that handles any exception passed as an arg and logs it"""
+def handled_exception(exceptions: Union[BaseException, Tuple[BaseException]], re_raise: Union[list, bool] = False):
+    """
+    Decorator that handles any exception(s) passed as an arg and logs it. re_raise param will re-raise any of the
+    exceptions the decorator handles after it has been logged. Pass True to re_raise param to re-raise all exceptions or
+    a list of exceptions to be re-raised.
+    """
     if not isinstance(exceptions, tuple):
         exceptions = (exceptions,)
 
@@ -39,6 +43,13 @@ def handled_exception(exceptions: Union[BaseException, Tuple[BaseException]]):
                 handled_exception_obj = HandledException(func=func, exception=e, call_args=args, call_kwargs=kwargs)
                 logger.info(handled_exception_obj)
                 NotificationBase().add_to_exception_stack(handled_exception_obj)
+                if re_raise:
+                    if isinstance(re_raise, list):
+                        for element in re_raise:
+                            if type(e) == element:
+                                raise e
+                    elif not isinstance(re_raise, list):
+                        raise e
         return wrapper_exceptions
     return decorator_exceptions
 
