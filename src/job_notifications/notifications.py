@@ -36,10 +36,12 @@ class Notifications(NotificationBase):
     def add_log(self, log: str) -> None:
         self._logs.append(log)
 
+    def extend_job_name(self, name: str) -> None:
+        self._job_name = self._job_name + " " + name
+
     def notify(self, error_message: Union[None, str] = None):
         """
         Sends out notification of job completion and the status.
-        :return:
         """
 
         subject = self._generate_notification_subject(error_message)
@@ -55,10 +57,6 @@ class Notifications(NotificationBase):
                      cc: Union[None, str] = None,
                      bcc: Union[None, str] = None,
                      attachments: Union[None, List[str]] = None) -> None:
-        """
-
-        :return:
-        """
         self._mail_service.email(to_address, from_address, subject, body, cc, bcc, attachments)
 
     def _generate_notification_subject(self, error_message):
