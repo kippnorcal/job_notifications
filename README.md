@@ -47,13 +47,13 @@ The entry point to the notifications package is through the `create_notificaiotn
 
 There is a third optional argument where you can pass the location of a log file to be attached to the notification message.
  
-```
+```python
 from job_notifications import create_notifications
 
 notifications = create_notifications('Some Project', "mailgun", logs='/path/to/some/log.file')
 ```
 Typically with ELT jobs at KIPP Nor Cal, we use the notifications in a try/except block under the `if __name__ == "__main__":` block:
-```
+```python
 if __name__ == '__main__':
     try:
         main()
@@ -62,7 +62,7 @@ if __name__ == '__main__':
         notifications.notify(error_message="Uh-oh!")
 ```
 Importing the built-in traceback module can give better error messages than "Uh-oh!":
-```
+```python
 if __name__ == '__main__':
     try:
         main()
@@ -77,7 +77,7 @@ Here are some extra features that are nice to have.
 If there is a common error occurring that you would like to capture without crashing the ETL job, the function where the error occurs can be decorated with a `@handled_exception` decorator.
 This decorator will take the exception you expect to catch as an argument or a tuple of exceptions if you are catching more than one.
 
-```
+```python
 from job_notifications import handled_exception
 
 @handled_exception(ValueError)
@@ -88,6 +88,42 @@ def multiples_of_three(x):
         logging.info(f"{x} is a multiple of three!")
 ```
 If any exceptions are caught, the Slack message will have "Succeeded with Warnings" as the subject line, and the message will have a log attached listing all of teh exceptions caught and where.
+
+#### Return None
+If there is a need to have a decorated function return None when an exceptions is handled, set `return_none` to True. This is useful when a function is calling other functions from third party packages that might raise an exception.
+
+```python
+from job_notifications import handled_exception
+
+@handled_exception(ValueError, return_none=True)
+def some_func(x):
+    y = this_func_raises_an_error(x)
+    return y  # This will return None
+```
+
+#### Re-Raise
+If there is a need to only log the exception and not handle the exception, set `re_raise` to True. This could be useful if another part of the code is handling the exception, but you just want to log that the exception was raised.
+
+```python
+from job_notifications import handled_exception
+
+@handled_exception((ValueError, KeyError), re_raise=True)
+def some_func(x):
+    y = this_func_raises_an_error(x)
+    return y 
+```
+
+If only certain exceptions need to be re-raised, then pass a list of the exceptions to re-raise. The below example will handle a `ValueError` or a `KeyError`, but only the `ValueError` will be re-raised.
+
+```python
+from job_notifications import handled_exception
+
+@handled_exception((ValueError, KeyError), re_raise=[ValueError])
+def some_func(x):
+    y = this_func_raises_an_error(x)
+    return y 
+```
+
 ### Timer
 Want to log how fast a function is?
 ```
