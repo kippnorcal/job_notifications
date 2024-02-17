@@ -94,3 +94,16 @@ def test_handled_exception_re_raises_correct_error():
     with pytest.raises(ValueError):
         to_be_decorated()
 
+
+def test_handled_exception_return_none():
+    @handled_exception(KeyError, return_none=True)
+    def to_be_decorated():
+        raise KeyError
+
+    def here_is_the_test():
+        d = to_be_decorated()
+        return d
+
+    result = here_is_the_test()
+    assert result is None
+
