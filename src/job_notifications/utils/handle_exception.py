@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class HandledException:
+class HandleException:
     func: FunctionType
     exception: Exception
     call_args: field(default_factory=list)  # type: ignore
@@ -34,4 +34,5 @@ class HandledException:
 
     def __str__(self):
         return f"{self.exception.__class__.__name__} raised on {self.func.__name__} " \
-               f"function in {self.func.__module__} module"
+               f"function in {self.func.__module__} module\n" \
+                f"Error message: {self.exception}"

@@ -32,7 +32,7 @@ class MailServiceBaseClass(ABC):
               to_address: str,
               from_address: str,
               subject: str,
-              body: str,
+              body: Union[None, str] = None,
               cc: Union[None, str] = None,
               bcc: Union[None, str] = None,
               attachments: Union[None, List[str]] = None) -> None:
@@ -57,7 +57,8 @@ class MailGunService(MailServiceBaseClass):
               to_address: str,
               from_address: str,
               subject: str,
-              body: str,
+              body: Union[None, str] = None,
+              html: Union[None, str] = None,
               cc: Union[None, str] = None,
               bcc: Union[None, str] = None,
               attachments: Union[None, List[str]] = None) -> None:
@@ -79,6 +80,7 @@ class MailGunService(MailServiceBaseClass):
                 "to": to_address,
                 "subject": subject,
                 "text": body,
+                "html": html,
                 "cc": cc,
                 "bcc": bcc,
             },
@@ -110,7 +112,7 @@ class GmailSMTPService(MailServiceBaseClass):
               to_address: str,
               from_address: str,
               subject: str,
-              body: str,
+              body: Union[None, str] = None,
               cc: Union[None, str] = None,
               bcc: Union[None, str] = None,
               attachments: Union[None, List[str]] = None) -> None:

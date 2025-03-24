@@ -2,10 +2,10 @@ from datetime import timedelta
 import logging
 from functools import wraps
 import time
-from typing import Union, Tuple, List
+from typing import Union, Tuple, List, Callable, Any
 
 from job_notifications.notifications import NotificationBase, Notifications
-from job_notifications.utils.handled_exception import HandledException
+from job_notifications.utils.handle_exception import HandleException
 from job_notifications.mail_services import create_mail_service
 from job_notifications.utils.helpers import join_kwargs, join_args
 
@@ -24,14 +24,18 @@ def create_notifications(job_name: str,
     return notifications_obj
 
 
-def handled_exception(
+def handle_exception(
         exceptions: Union[BaseException, Tuple[BaseException]],
         re_raise: Union[list, bool] = False,
-        return_none: bool = False) -> Union[object, Exception, None]:
+        return_none: bool = False,
+        return_false: bool = False,
+        callback: Union[Callable[[Any], Any], None] = None) -> Union[object, Exception, None]:
     """
     Decorator that handles any exception(s) passed as an arg and logs it. re_raise param will re-raise any of the
     exceptions the decorator handles after it has been logged. Pass True to re_raise param to re-raise all exceptions or
-    a list of exceptions to be re-raised.
+    a list of exceptions to be re-raised. Pass true to return_none to force the return value to be None. Pass true to
+    return_false to force the return value to be false. Pass any callable to callback to be called after exception
+    is handled.
     """
     if not isinstance(exceptions, tuple):
         exceptions = (exceptions,)
@@ -43,7 +47,7 @@ def handled_exception(
             try:
                 return func(*args, **kwargs)
             except exceptions as e:  # type: ignore
-                handled_exception_obj = HandledException(func=func, exception=e, call_args=args, call_kwargs=kwargs)
+                handled_exception_obj = HandleException(func=func, exception=e, call_args=args, call_kwargs=kwargs)
                 logger.info(handled_exception_obj)
                 NotificationBase().add_to_exception_stack(handled_exception_obj)
                 if re_raise:
@@ -53,8 +57,16 @@ def handled_exception(
                                 raise e
                     elif not isinstance(re_raise, list):
                         raise e
+                elif callback is not None:
+                    if hasattr(callback, '__call__'):
+                        logger.info(f"Executing callback: {callback.__name__}")
+                        callback(*args, **kwargs)
+                    else:
+                        logger.warning(f"handled_exception callback: {callback.__name__} is not callable.")
                 if return_none:
                     return None
+                if return_false:
+                    return False
         return wrapper_exceptions
     return decorator_exceptions
 
