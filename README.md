@@ -78,9 +78,10 @@ If there is a common error occurring that you would like to capture without cras
 This decorator will take the exception you expect to catch as an argument or a tuple of exceptions if you are catching more than one.
 
 ```python
-from job_notifications import handled_exception
+from job_notifications import handle_exception
 
-@handled_exception(ValueError)
+
+@handle_exception(ValueError)
 def multiples_of_three(x):
     if x % 3 != 0:
         raise ValueError("Not a multiple of three!")
@@ -93,9 +94,10 @@ If any exceptions are caught, the Slack message will have "Succeeded with Warnin
 If there is a need to have a decorated function return None when an exceptions is handled, set `return_none` to True. This is useful when a function is calling other functions from third party packages that might raise an exception.
 
 ```python
-from job_notifications import handled_exception
+from job_notifications import handle_exception
 
-@handled_exception(ValueError, return_none=True)
+
+@handle_exception(ValueError, return_none=True)
 def some_func(x):
     y = this_func_raises_an_error(x)
     return y  # This will return None
@@ -105,9 +107,10 @@ def some_func(x):
 If there is a need to only log the exception and not handle the exception, set `re_raise` to True. This could be useful if another part of the code is handling the exception, but you just want to log that the exception was raised.
 
 ```python
-from job_notifications import handled_exception
+from job_notifications import handle_exception
 
-@handled_exception((ValueError, KeyError), re_raise=True)
+
+@handle_exception((ValueError, KeyError), re_raise=True)
 def some_func(x):
     y = this_func_raises_an_error(x)
     return y 
@@ -116,9 +119,10 @@ def some_func(x):
 If only certain exceptions need to be re-raised, then pass a list of the exceptions to re-raise. The below example will handle a `ValueError` or a `KeyError`, but only the `ValueError` will be re-raised.
 
 ```python
-from job_notifications import handled_exception
+from job_notifications import handle_exception
 
-@handled_exception((ValueError, KeyError), re_raise=[ValueError])
+
+@handle_exception((ValueError, KeyError), re_raise=[ValueError])
 def some_func(x):
     y = this_func_raises_an_error(x)
     return y 

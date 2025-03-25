@@ -1,7 +1,7 @@
 import os
 from typing import Union, List
 
-from job_notifications.utils.handled_exception import HandledException
+from job_notifications.utils.handle_exception import HandleException
 from job_notifications.mail_services import MailServiceBaseClass
 
 
@@ -13,12 +13,12 @@ class NotificationBase:
     The other methods related to the exception stack were included to group them together in one place.
     """
 
-    _exception_stack: List[HandledException] = []
+    _exception_stack: List[HandleException] = []
 
-    def add_to_exception_stack(self, e: HandledException) -> None:
+    def add_to_exception_stack(self, e: HandleException) -> None:
         self._exception_stack.append(e)
 
-    def exception_stack(self) -> List[HandledException]:
+    def exception_stack(self) -> List[HandleException]:
         return self._exception_stack
 
     @property
