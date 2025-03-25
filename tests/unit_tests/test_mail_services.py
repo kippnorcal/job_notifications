@@ -8,6 +8,7 @@ from unittest.mock import patch, mock_open, Mock
 import pytest
 
 
+# Todo: Remove this test in future, it's not needed
 def test_eval_status():
     return MailGunService(
         job_name='Test',
