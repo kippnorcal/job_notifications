@@ -1,8 +1,52 @@
 [build-system]
-requires = ["setuptools>=42.0", "wheel"]
+requires = ["setuptools>=64", "setuptools-scm[toml]>=8", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tools.pytest.ini_options]
+[project]
+name = "job_notifications"
+description = "Simple package for sending ETL job notifications to Slack"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Mark Young" }]
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: POSIX :: Linux",
+  "Operating System :: MacOS",
+]
+dynamic = ["version"]
+
+dependencies = [
+  # add runtime dependencies here, if any
+]
+
+[project.optional-dependencies]
+testing = [
+  "flake8>=6.0",
+  "tox>=4.0",
+  "pytest>=7.0",
+  "pytest-cov>=4.0",
+  "mypy>=1.0",
+  "requests>=2.0",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["job_notifications*"]
+
+[tool.setuptools.package-data]
+job_notifications = ["py.typed"]
+
+[tool.setuptools_scm]
+version_scheme = "guess-next-dev"
+local_scheme = "node-and-date"
+
+[tool.pytest.ini_options]
 log_cli = true
 log_cli_level = "INFO"
 addopts = "--cov=job_notifications"
@@ -19,3 +63,6 @@ warn_return_any = true
 warn_unreachable = true
 warn_unused_configs = true
 no_implicit_reexport = true
+
+[tool.flake8]
+max-line-length = 121
